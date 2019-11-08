@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Excluir</h2>
+
+    <form method="POST" action="{{ url_for('excluir_pessoa') }}">
+        <p>Você realmente deseja excluir {{ pessoa.nome }}</p>
+        <input type="hidden" name="idP" value="{{ pessoa.idPessoa }}">
+        <button type="submit">Sim</button>
+    </form>
+    <p><a href="/listar">Não</a></p>
+{% endblock %}
