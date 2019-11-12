@@ -1,0 +1,158 @@
+mysql -h ampto.sj.ifsc.edu.br -u marcone -P 33060 -p
+
+seha = 1234
+
+Import banco - Dentro do cliente mysql
+	mysql> source /home/marcone/Downloads/lab02.sql
+
+Exibir as tabelas:
+	mysql> show databases;
+
+Exibir a tabela:
+	mysql> SELECT * FROM Funcionario;
+	mysql> SELECT * FROM Departamento;
+
+Enable Auto complete
+	\#
+
+Excluir tabela 
+	mysql> DROP TABLE Nome_Tabela;
+
+
+###################################################################################################################################################
+Lab 02
+
+1.Liste o sobrenome de todos os funcionários;
+	mysql> SELECT Sobrenome FROM Funcionario;
+
+2.Liste o sobrenome de todos os funcionários, porém sem duplicatas;
+	mysql> SELECT DISTINCT Sobrenome FROM Funcionario;
+
+3.Liste o nome de todos os departamentos cujo orçamento seja maior que 15.000, 00;
+	mysql> SELECT dnome FROM Departamento WHERE Orcamento > 15000;
+
+4.Liste todos os dados de todos os funcionários cujo sobrenome seja “Coelho” ou “Pereira” e apresente o resultado ordenado pelo nome do funcionário;
+	mysql> SELECT * FROM Funcionario WHERE Sobrenome = 'Coelho' OR Sobrenome = 'Pereira' ORDER BY Nome;
+
+5.Liste todos os dados de todos os funcionários que trabalham no departamento 1;
+	mysql> SELECT * FROM Funcionario WHERE idDepartamento = 1;
+
+6. Liste os nomes de todos os funcionários que trabalham nos departamentos 1 ou 2;
+	mysql> SELECT * FROM Funcionario WHERE idDepartamento = 1 OR idDepartamento = 2;
+
+7.Liste os nomes de todos os funcionários cujo sobrenome termine em eira e apresente o resultado ordenado pelo nome e sobrenome;
+	mysql> SELECT Nome, Sobrenome FROM Funcionario WHERE Sobrenome LIKE '%eira' ORDER BY Nome, Sobrenome;
+
+8.Liste a soma dos orçamentos de todos os departamentos;
+	mysql> SELECT SUM(Orcamento) As total FROM Departamento;
+
+9.Liste o total de funcionários de cada departamento. Atenção: só é necessário informar o código do departamento e o total de funcionários;
+	mysql> SELECT idDepartamento, COUNT(Nome) AS quantidade FROM Funcionario GROUP BY idDepartamento;
+
+10.Adicione um departamento Compras com o orçamento de 100.000, 00 e adicione um funcionário “Juliano Souza”, com matrícula 786, nesse novo departamento;
+	mysql>INSERT INTO Departamento(idDepartamento, dNome, Orcamento) VALUES (6, 'Compras', 100000);
+	mysql> INSERT INTO Funcionario(idFuncionario, Nome, Sobrenome, idDepartamento) VALUES (786, 'Juliano', 'Souza', 6);
+
+11.Reduzir em 10% o orçamento de todos os departamentos;
+	mysql> UPDATE Departamento SET Orcamento := (Orcamento*0.9);
+
+12.Exclua o departamento “Pesquisa e desenvolvimento”;
+	mysql> DELETE FROM Departamento WHERE dNome = 'Pesquisa e Desenvolvimento';
+	ERROR 1451 (23000): Cannot delete or update a parent row: a foreign 	key constraint fails (`lab02marcone`.`Funcionario`, CONSTRAINT 		`fk_Funcionario_Departamento` FOREIGN KEY (`idDepartamento`) REFERENCES `Departamento` (`idDepartamento`))
+
+13.Migrar todos os funcionários do departamento “Pesquisa e desenvolvimento” para o departamento de “TI”.
+	mysql> UPDATE Funcionario SET idDepartamento :=2 WHERE idDepartamento = 4;
+
+14.Adicione o funcionário “Paulo Aguiar”, com idFuncionario = 123, no departamento de TI;
+	mysql> INSERT INTO Funcionario(idFuncionario, Nome, Sobrenome, idDepartamento) VALUES (123, 'Paulo', 'Aguiar', 2);
+	ERROR 1062 (23000): Duplicate entry '123' for key 'PRIMARY'
+
+15.Exclua todos os funcionários do departamento de TI
+	mysql> DELETE FROM Funcionario WHERE idDepartamento = 2;
+
+16.Adicione 3 novos funcionários no departamento Financeiro;	
+	mysql> INSERT INTO Funcionario(idFuncionario, Nome, Sobrenome, idDepartamento) VALUES (234, 'Paulo', 'Aguiar', 1),(345, 'Pedro' , 'Paulo', 		1), (456, 'Carlos' , 'Augusto', 1);
+
+###################################################################################################################################################
+
+Parte 2. Linguagem de definição de dados – DDL
+
+		1..1				0..n
+COR -------------------------- TEM ------------------------- AUTOMÓVEL
+
+Significa dizer que: 1 Automóvel tem 1 cor, uma cor tem 0 ou n automóveis.
+
+
+17.Tendo como base o exemplo apresentado na Figura 1, crie, usando SQL, uma relação para
+Cor e uma relação para Autom´ovel e represente corretamente o relacionamento entre essas
+entidades, conforme ilustrado pelo diagrama ER da Figura 2a. É necessário indicar quais
+atributos são de preenchimento obrigatório (NOT NULL).
+	CREATE TABLE Automovel (
+  		id int(11) NOT NULL,
+		idCor int(11) NOT NULL,
+  		Modelo varchar(45) NOT NULL,
+  		Chassi varchar(45) NOT NULL,
+  		PRIMARY KEY (id),
+  		KEY Automovel_Cor (id),
+  		CONSTRAINT Automovel_Cor FOREIGN KEY (idCor) REFERENCES Cor (idCor)
+		);
+
+	CREATE TABLE Cor (
+  		idCor int(11) NOT NULL,
+  		Nome varchar(45) NOT NULL,
+  		Fabricante varchar(45) NOT NULL,
+  		PRIMARY KEY (idCor)
+		);	
+	
+18.Insira 5 carros na relação Automóvel com os valores que desejar para cada atributo.
+	mysql> INSERT INTO Cor(id, Nome, Fabricante) VALUES(1, "Branco", "Sherwin-Williams");
+
+	mysql> INSERT INTO Automovel(id, Modelo, Chassi) VALUES(1, 'Gol' , '1234aa'),(2, 'Peugeot' , '1234bb'),(3, 'Fiesta', '1234cc'),(1, 'Palio' , '1234dd'), (1, 'Ka' , '1234ee');
+
+
+###################################################################################################################################################
+
+lab03
+
+comando - use lab03marcone;
+
+listar id dos correntistas - (SELECT idPessoa FROM Correntista);/
+
+// consulta nome atrelando a chave estrangeira com a tabela Correntista
+(SELECT nome FROM Pessoa NATURAL JOIN Correntista);
+
+// consulta nome atrelando a chave estrangeira com a tabela Correntista juntamente com a tabela Mutuario
+(SELECT nome FROM Pessoa NATURAL JOIN Correntista) UNION (SELECT nome FROM Pessoa NATURAL JOIN Mutuario);
+
+// consulta nome atrelando a chave estrangeira com a tabela Correntista juntamente com a tabela Mutuario, uma entrada aparece repetida se estiver nas duas tabelas.
+(SELECT nome FROM Pessoa NATURAL JOIN Correntista) UNION ALL (SELECT nome FROM Pessoa NATURAL JOIN Mutuario);
+
+
+1 - Liste todos os dados de todos os funcionairios e seus departamentos:
+	mysql> SELECT * FROM Funcionario NATURAL JOIN Departamento;
+
+2 - Listar nome do funcionário e nome do departamento que está lotado;
+	mysql> SELECT nome, dNome FROM Funcionario NATURAL JOIN Departamento;
+
+3 - nome e sobrenome de funcionarios onde os departamentos possuam orçamento maior que 60.000,00
+	mysql> SELECT nome, sobrenome FROM Funcionario NATURAL JOIN Departamento WHERE Orcamento > 60000;
+
+4 - nome dos departamento que possuem mais do que 2 funcionários
+	mysql> SELECT D.dNome FROM Funcionario F INNER JOIN Departamento D ON D.idDepartamento = F.idDepartamento GROUP BY D.dNome HAVING COUNT(*) > 2;
+
+// lista nome e orçamento do departamento com maior orçamento
+mysql> SELECT dNome, Orcamento FROM Departamento WHERE Orcamento = (SELECT MAX(Orcamento) FROM Departamento);
+
+//Listar id dos clientes que possuem emprestimo e conta
+mysql> SELECT idPessoa FROM Correntista WHERE idPessoa IN (SELECT idPessoa FROM Mutuario);
+
+//Listar id dos clientes que possuem emprestimo mas não possuem conta
+mysql> SELECT idPessoa FROM Correntista WHERE idPessoa NOT IN (SELECT idPessoa FROM Correntista);
+
+//listar cpf dos presidentes das empresas que fabricam produtos em SC e SP
+select cpf from Empresa where idEmpresa IN (Select idEmpresa From Produto where ufFabrica = 'SP') and idEmpresa (select idEmpresa From Produto where ufFabrica = 'SC');
+
+
+
+
+
